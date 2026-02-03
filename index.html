@@ -2,112 +2,86 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>掷筊 - 佛祖灵应</title>
     <style>
         :root { --wood-red: #8b0000; --flat-red: #d32f2f; --gold: #ffd700; }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body { 
             background: radial-gradient(circle at center, #2c0000 0%, #1a1a1a 100%); 
-            color: white; 
-            text-align: center; 
-            font-family: "STKaiti", "KaiTi", serif; 
-            margin: 0; 
-            overflow: hidden; /* 禁止页面滚动 */
-            touch-action: none; /* 禁止微信下拉回弹 */
+            color: white; text-align: center; font-family: "STKaiti", "KaiTi", serif; 
+            margin: 0; overflow: hidden; touch-action: none;
         }
 
         .container { 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: space-between; /* 垂直方向均匀分配 */
-            perspective: 1200px; 
-            padding: 5vh 20px; /* 使用视口高度留白 */
+            height: 100vh; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; /* 居中分布 */
+            padding: 20px; gap: 4vh; /* 统一元素间距 */
         }
 
-        h1 { font-size: 1.6rem; margin: 0; color: var(--gold); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        h1 { font-size: 1.5rem; margin: 0; color: var(--gold); }
 
-        /* 记录面板自适应 */
-        .record-panel { display: flex; gap: 10px; width: 100%; justify-content: center; }
+        /* 记录面板 */
+        .record-panel { display: flex; gap: 8px; width: 100%; justify-content: center; }
         .record-slot { 
-            flex: 1; max-width: 85px; height: 90px; 
-            border: 1px dashed #666; border-radius: 10px;
+            flex: 1; max-width: 80px; height: 75px; 
+            border: 1px dashed #666; border-radius: 8px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.05); transition: 0.3s;
+            background: rgba(255,255,255,0.05);
         }
-        .record-slot.active { border-color: var(--gold); background: rgba(255,215,0,0.1); transform: translateY(-3px); }
-        .slot-tag { font-size: 12px; color: #888; margin-bottom: 5px; }
-        .slot-val { font-size: 1.2rem; font-weight: bold; }
+        .record-slot.active { border-color: var(--gold); background: rgba(255,215,0,0.1); }
+        .slot-tag { font-size: 10px; color: #888; }
+        .slot-val { font-size: 1rem; font-weight: bold; margin-top: 4px; }
 
-        /* 筊杯区域自适应 */
+        /* 筊杯区域 */
         .bwei-box { 
-            display: flex; 
-            gap: 15%; 
-            height: 25vh; 
-            align-items: center; 
-            justify-content: center;
-            width: 100%;
+            display: flex; gap: 10%; height: 20vh; 
+            align-items: center; justify-content: center; width: 100%;
+            perspective: 1200px;
         }
-        
         .bwei {
-            position: relative; 
-            width: 28vw; /* 随屏幕宽度变化 */
-            max-width: 120px;
-            aspect-ratio: 2 / 1; /* 保持月牙比例 */
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; width: 25vw; max-width: 100px; aspect-ratio: 2 / 1;
+            transform-style: preserve-3d; transition: transform 0.8s ease-out;
         }
-
-        .side-curved {
+        .side-curved, .side-flat {
             position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(ellipse at center, var(--wood-red) 0%, #4a0000 100%);
-            border-radius: 120px 120px 15px 15px;
-            backface-visibility: hidden;
-            box-shadow: inset 0 -5px 15px rgba(0,0,0,0.5);
+            border-radius: 100px 100px 10px 10px; backface-visibility: hidden;
         }
-        .side-flat {
-            position: absolute; width: 100%; height: 100%;
-            background: var(--flat-red);
-            border-radius: 120px 120px 15px 15px;
-            transform: rotateX(180deg);
-            backface-visibility: hidden;
-            border-bottom: 3px solid #7b0000;
-        }
+        .side-curved { background: radial-gradient(circle, #a00, #500); box-shadow: inset 0 -3px 8px rgba(0,0,0,0.6); }
+        .side-flat { background: #d32f2f; transform: rotateX(180deg); border-bottom: 2px solid #700; }
 
         .tossing { animation: toss-anim 0.8s ease-in-out; }
         @keyframes toss-anim {
             0% { transform: translateY(0) rotateX(0); }
-            50% { transform: translateY(-35vh) rotateX(720deg) rotateY(180deg); }
+            50% { transform: translateY(-25vh) rotateX(720deg); }
             100% { transform: translateY(0); }
         }
 
-        /* 状态显示 */
-        #status { font-size: 1.1rem; color: var(--gold); height: 1.5rem; font-weight: bold; }
+        #status { font-size: 1rem; color: var(--gold); height: 1.2rem; font-weight: bold; }
 
-        /* 弹窗自适应 */
-        #final-verdict-box { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            width: 85%; max-width: 320px;
-            background: rgba(15,0,0,0.98); border: 2px solid var(--gold); padding: 30px;
-            border-radius: 20px; z-index: 100; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 50px rgba(255,215,0,0.3);
+        /* 底部控制区：改为左右排列 */
+        .controls { 
+            display: flex; gap: 15px; width: 100%; max-width: 320px; 
+            justify-content: center; align-items: center;
         }
-        #final-verdict-box.show { transform: translate(-50%, -50%) scale(1); }
-
-        /* 控制区 */
-        .controls { width: 100%; max-width: 280px; display: flex; flex-direction: column; gap: 15px; }
         button {
-            width: 100%; padding: 14px; font-size: 1.2rem; border-radius: 30px; cursor: pointer;
+            padding: 12px 20px; font-size: 1.1rem; border-radius: 25px; cursor: pointer;
             font-family: inherit; transition: 0.3s; border: none;
         }
-        .btn-main { background: #b71c1c; color: var(--gold); border: 2px solid var(--gold); }
-        .btn-sub { background: transparent; color: #888; border: 1px solid #444; font-size: 0.9rem; }
+        .btn-main { flex: 2; background: #b71c1c; color: var(--gold); border: 2px solid var(--gold); font-weight: bold; }
+        .btn-sub { flex: 1; background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid #444; font-size: 0.9rem; }
         button:disabled { opacity: 0.3; }
-        button:active { transform: scale(0.95); }
+        button:active { transform: scale(0.92); }
+
+        /* 弹窗 */
+        #final-verdict-box { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 80%; max-width: 280px; background: rgba(20,0,0,0.98); 
+            border: 2px solid var(--gold); padding: 25px; border-radius: 15px; z-index: 100; 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #final-verdict-box.show { transform: translate(-50%, -50%) scale(1); }
     </style>
 </head>
 <body>
@@ -116,9 +90,9 @@
     <h1>⛩️ 虔诚祈祷 三掷定音 ⛩️</h1>
 
     <div class="record-panel">
-        <div class="record-slot" id="slot-0"><span class="slot-tag">第一掷</span><span class="slot-val" id="val-0">-</span></div>
-        <div class="record-slot" id="slot-1"><span class="slot-tag">第二掷</span><span class="slot-val" id="val-1">-</span></div>
-        <div class="record-slot" id="slot-2"><span class="slot-tag">第三掷</span><span class="slot-val" id="val-2">-</span></div>
+        <div class="record-slot" id="slot-0"><span class="slot-tag">一掷</span><span class="slot-val" id="val-0">-</span></div>
+        <div class="record-slot" id="slot-1"><span class="slot-tag">二掷</span><span class="slot-val" id="val-1">-</span></div>
+        <div class="record-slot" id="slot-2"><span class="slot-tag">三掷</span><span class="slot-val" id="val-2">-</span></div>
     </div>
 
     <div id="status">请点击掷筊</div>
@@ -130,15 +104,15 @@
 
     <div class="controls">
         <button id="tossBtn" class="btn-main" onclick="toss()">掷 筊</button>
-        <button class="btn-sub" onclick="resetAll()">重新开始</button>
+        <button class="btn-sub" onclick="resetAll()">重置</button>
     </div>
 </div>
 
 <div id="final-verdict-box">
-    <div style="font-size: 1.1rem; color: #aaa;">佛祖最终旨意</div>
-    <div id="final-title" style="font-size: 3.5rem; font-weight: bold; margin: 15px 0;"></div>
-    <div id="final-desc" style="font-size: 1.1rem; color: #fff; margin-bottom: 25px;"></div>
-    <button class="btn-main" style="padding: 10px;" onclick="closeVerdict()">了然</button>
+    <div style="font-size: 0.9rem; color: #aaa;">佛祖最终旨意</div>
+    <div id="final-title" style="font-size: 3rem; font-weight: bold; margin: 10px 0;"></div>
+    <div id="final-desc" style="font-size: 1rem; color: #fff; margin-bottom: 20px;"></div>
+    <button class="btn-main" style="width:100%;" onclick="closeVerdict()">了然</button>
 </div>
 
 <script>
@@ -147,109 +121,69 @@
 
     function toss() {
         if (currentStep >= 3) return;
+        const b1 = document.getElementById('bwei1'), b2 = document.getElementById('bwei2');
+        const btn = document.getElementById('tossBtn'), status = document.getElementById('status');
 
-        const b1 = document.getElementById('bwei1');
-        const b2 = document.getElementById('bwei2');
-        const tossBtn = document.getElementById('tossBtn');
-        const status = document.getElementById('status');
-
-        tossBtn.disabled = true;
+        btn.disabled = true;
         status.innerText = "佛祖定夺中...";
+        b1.classList.remove('tossing'); b2.classList.remove('tossing');
+        void b1.offsetWidth;
 
-        b1.classList.remove('tossing');
-        b2.classList.remove('tossing');
-        void b1.offsetWidth; 
-
-        const res1 = Math.random() > 0.5 ? 0 : 1;
-        const res2 = Math.random() > 0.5 ? 0 : 1;
-
-        b1.classList.add('tossing');
-        b2.classList.add('tossing');
-
-        // 手机震动反馈 (如果设备支持)
-        if (window.navigator.vibrate) window.navigator.vibrate(50);
+        const res1 = Math.random() > 0.5 ? 0 : 1, res2 = Math.random() > 0.5 ? 0 : 1;
+        b1.classList.add('tossing'); b2.classList.add('tossing');
 
         setTimeout(() => {
-            b1.style.transform = `rotateX(${res1 === 0 ? 180 : 0}deg) rotateZ(${Math.random()*40-20}deg)`;
-            b2.style.transform = `rotateX(${res2 === 0 ? 180 : 0}deg) rotateZ(${Math.random()*40-20}deg)`;
+            b1.style.transform = `rotateX(${res1 === 0 ? 180 : 0}deg) rotateZ(${Math.random()*30-15}deg)`;
+            b2.style.transform = `rotateX(${res2 === 0 ? 180 : 0}deg) rotateZ(${Math.random()*30-15}deg)`;
 
-            let resultName = "";
-            let color = "";
-            if (res1 !== res2) { resultName = "圣筊"; color = "#00ff88"; }
-            else if (res1 === 1) { resultName = "阴筊"; color = "#ff4444"; }
-            else { resultName = "笑筊"; color = "#ffcc00"; }
+            let name = (res1 !== res2) ? "圣筊" : (res1 === 1 ? "阴筊" : "笑筊");
+            let color = (res1 !== res2) ? "#00ff88" : (res1 === 1 ? "#ff4444" : "#ffcc00");
 
-            historyResults.push(resultName);
-            updateRecord(currentStep, resultName, color);
-            
+            historyResults.push(name);
+            updateRecord(currentStep, name, color);
             currentStep++;
+
             if (currentStep < 3) {
                 status.innerText = `第 ${currentStep} 掷完成`;
-                tossBtn.disabled = false;
+                btn.disabled = false;
             } else {
                 status.innerText = "三掷已毕.";
-                setTimeout(calculateFinalVerdict, 1000);
+                setTimeout(calculateFinalVerdict, 800);
             }
         }, 800);
     }
 
     function updateRecord(step, name, color) {
-        const slot = document.getElementById(`slot-${step}`);
         const val = document.getElementById(`val-${step}`);
-        slot.classList.add('active');
-        val.innerText = name;
-        val.style.color = color;
+        document.getElementById(`slot-${step}`).classList.add('active');
+        val.innerText = name; val.style.color = color;
     }
 
     function calculateFinalVerdict() {
         const counts = {};
         historyResults.forEach(r => counts[r] = (counts[r] || 0) + 1);
-        let finalVerdict = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-
+        let final = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
         const box = document.getElementById('final-verdict-box');
-        const title = document.getElementById('final-title');
-        const desc = document.getElementById('final-desc');
-
-        title.innerText = finalVerdict;
-        
-        if (finalVerdict === "圣筊") {
-            title.style.color = "#00ff88";
-            desc.innerText = "佛祖应允，大吉";
-        } else if (finalVerdict === "阴筊") {
-            title.style.color = "#ff4444";
-            desc.innerText = "佛祖不允，请审慎考虑";
-        } else {
-            title.style.color = "#ffcc00";
-            desc.innerText = "佛祖多次笑而不语";
-        }
-
+        document.getElementById('final-title').innerText = final;
+        document.getElementById('final-title').style.color = (final==="圣筊")?"#00ff88":(final==="阴筊")?"#ff4444":"#ffcc00";
+        document.getElementById('final-desc').innerText = (final==="圣筊")?"佛祖应允，大吉":(final==="阴筊")?"佛祖不允，审慎考虑":"佛祖笑而不语";
         box.classList.add('show');
-        if (window.navigator.vibrate) window.navigator.vibrate([100, 50, 100]);
     }
 
-    function closeVerdict() {
-        document.getElementById('final-verdict-box').classList.remove('show');
-        document.getElementById('tossBtn').innerText = "请重置";
-    }
+    function closeVerdict() { document.getElementById('final-verdict-box').classList.remove('show'); }
 
     function resetAll() {
-        currentStep = 0;
-        historyResults = [];
+        currentStep = 0; historyResults = [];
         const btn = document.getElementById('tossBtn');
-        btn.disabled = false;
-        btn.innerText = "掷 筊";
-        document.getElementById('status').innerText = "已重置，请重新请示";
+        btn.disabled = false; btn.innerText = "掷 筊";
+        document.getElementById('status').innerText = "已重置";
         document.getElementById('final-verdict-box').classList.remove('show');
-        
         for (let i = 0; i < 3; i++) {
-            const slot = document.getElementById(`slot-${i}`);
-            const val = document.getElementById(`val-${i}`);
-            slot.classList.remove('active');
-            val.innerText = "-";
-            val.style.color = "white";
+            document.getElementById(`slot-${i}`).classList.remove('active');
+            document.getElementById(`val-${i}`).innerText = "-";
+            document.getElementById(`val-${i}`).style.color = "white";
         }
     }
 </script>
-
 </body>
 </html>
